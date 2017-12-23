@@ -41,6 +41,7 @@ CSS_FOLLOWERS = "a[href='/{}/followers/']"
 CSS_FOLLOWING = "a[href='/{}/following/']"
 FOLLOWER_PATH = "//div[contains(text(), 'Followers')]"
 FOLLOWING_PATH = "//div[contains(text(), 'Following')]"
+FOLLOW_LIST_XPATH = "//li[@class='_6e4x5']"
 
 # JAVASCRIPT COMMANDS
 SCROLL_UP = "window.scrollTo(0, 0);"
@@ -270,8 +271,10 @@ class InstagramCrawler(object):
         List.click()
 
         # Loop through list till target number is reached
-        num_of_shown_follow = len(List.find_elements_by_xpath('*'))
-        while len(List.find_elements_by_xpath('*')) < number:
+        num_of_shown_follow = len(List.find_elements_by_xpath(FOLLOW_LIST_XPATH))
+        print('num of shown follow is ' + len(num_of_shown_follow))
+
+        while len(List.find_elements_by_xpath(FOLLOW_LIST_XPATH)) < number:
             element = List.find_elements_by_xpath('*')[-1]
             # Work around for now => should use selenium's Expected Conditions!
             try:
@@ -280,7 +283,7 @@ class InstagramCrawler(object):
                 time.sleep(0.1)
 
         follow_items = []
-        for ele in List.find_elements_by_xpath('*')[:number]:
+        for ele in List.find_elements_by_xpath(FOLLOW_LIST_XPATH)[:number]:
             follow_items.append(ele.text.split('\n')[0])
 
         self.data[crawl_type] = follow_items
