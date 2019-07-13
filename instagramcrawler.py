@@ -157,18 +157,15 @@ class InstagramCrawler(object):
 
     def scroll_to_num_of_posts(self, number):
         # Get total number of posts of page
-        num_info = re.search(r'\], "count": \d+',
-                             self._driver.page_source).group()
-        num_of_posts = int(re.findall(r'\d+', num_info)[0])
+        # instagram returns a number like u'70,478,137'
+        num_re = re.search(r'([\d,]+)\s*</span>\s*posts\s*<\/span>',
+                            self._driver.page_source)
+        if num_re:
+            num_of_posts = int(num_re.groups()[0].replace(',',''))
+        else:
+            print("failed to parse number of posts of page")
         print("posts: {}, number: {}".format(num_of_posts, number))
         number = number if number < num_of_posts else num_of_posts
-
-        # scroll page until reached
-        loadmore = WebDriverWait(self._driver, 10).until(
-            EC.presence_of_element_located(
-                (By.CSS_SELECTOR, CSS_LOAD_MORE))
-        )
-        loadmore.click()
 
         num_to_scroll = int((number - 12) / 12) + 1
         for _ in range(num_to_scroll):
